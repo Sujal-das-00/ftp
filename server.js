@@ -1,10 +1,14 @@
 const express = require('express');
 const multer = require('multer');
 const fs = require('fs');
+const cors = require('cors');
+
 const path = require('path');
 
 const app = express();
-const PORT = 3000;
+const PORT = 5000;
+app.use(cors());
+
 
 const imageDir = path.join(__dirname, 'images');
 

@@ -29,21 +29,21 @@ document.addEventListener('DOMContentLoaded', () => {
 function setupEventListeners() {
     // Form submission
     form.addEventListener('submit', handleUpload);
-    
+
     // File input change for preview
     fileInput.addEventListener('change', handleFileSelect);
-    
+
     // Remove preview
     removePreview.addEventListener('click', removeImagePreview);
-    
+
     // Search functionality
     searchInput.addEventListener('input', handleSearch);
-    
+
     // View toggle
     viewToggleButtons.forEach(btn => {
         btn.addEventListener('click', handleViewToggle);
     });
-    
+
     // Drag and drop functionality
     setupDragAndDrop();
 }
@@ -51,38 +51,38 @@ function setupEventListeners() {
 // Drag and Drop
 function setupDragAndDrop() {
     const fileWrapper = document.querySelector('.file-input-wrapper');
-    
+
     ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
         fileWrapper.addEventListener(eventName, preventDefaults, false);
     });
-    
+
     ['dragenter', 'dragover'].forEach(eventName => {
         fileWrapper.addEventListener(eventName, highlight, false);
     });
-    
+
     ['dragleave', 'drop'].forEach(eventName => {
         fileWrapper.addEventListener(eventName, unhighlight, false);
     });
-    
+
     fileWrapper.addEventListener('drop', handleDrop, false);
-    
+
     function preventDefaults(e) {
         e.preventDefault();
         e.stopPropagation();
     }
-    
+
     function highlight(e) {
         fileWrapper.classList.add('drag-over');
     }
-    
+
     function unhighlight(e) {
         fileWrapper.classList.remove('drag-over');
     }
-    
+
     function handleDrop(e) {
         const dt = e.dataTransfer;
         const files = dt.files;
-        
+
         if (files && files.length > 0) {
             fileInput.files = files;
             handleFileSelect();
@@ -93,23 +93,23 @@ function setupDragAndDrop() {
 // File Handling
 function handleFileSelect() {
     const file = fileInput.files[0];
-    
+
     if (file) {
         // Validate file type
         if (!file.type.startsWith('image/')) {
             showToast('Please select an image file (PNG, JPG, GIF)', 'error');
             return;
         }
-        
+
         // Validate file size (10MB limit)
         if (file.size > 10 * 1024 * 1024) {
             showToast('File size must be less than 10MB', 'error');
             return;
         }
-        
+
         // Show preview
         showImagePreview(file);
-        
+
         // Update button text
         uploadBtn.innerHTML = `
             <i class="fas fa-upload"></i>
@@ -120,12 +120,12 @@ function handleFileSelect() {
 
 function showImagePreview(file) {
     const reader = new FileReader();
-    
+
     reader.onload = (e) => {
         previewImage.src = e.target.result;
         previewContainer.style.display = 'block';
     };
-    
+
     reader.readAsDataURL(file);
 }
 
@@ -142,33 +142,35 @@ function removeImagePreview() {
 // Upload Handling
 async function handleUpload(e) {
     e.preventDefault();
-    
+
     const file = fileInput.files[0];
-    
+
     if (!file) {
         showToast('Please select a file to upload', 'error');
         return;
     }
-    
+
     try {
         showLoading(true);
-        
+
         const formData = new FormData(form);
-        
-        const response = await fetch('/upload', {
+
+        const response = await fetch('http://127.0.0.1:5000/upload', {
             method: 'POST',
             body: formData
         });
-        
+
+
         if (!response.ok) {
             throw new Error('Upload failed');
+            console.log(response)
         }
-        
+
         showToast('Image uploaded successfully!', 'success');
         form.reset();
         removeImagePreview();
         loadImages();
-        
+
     } catch (error) {
         console.error('Upload error:', error);
         showToast('Upload failed. Please try again.', 'error');
@@ -182,10 +184,10 @@ async function loadImages() {
     try {
         const res = await fetch('/api/images');
         images = await res.json();
-        
+
         updateGalleryStats();
         applyFilters();
-        
+
     } catch (error) {
         console.error('Error loading images:', error);
         showToast('Failed to load images', 'error');
@@ -194,16 +196,16 @@ async function loadImages() {
 
 function renderGallery() {
     gallery.innerHTML = '';
-    
+
     if (filteredImages.length === 0) {
         emptyState.style.display = 'block';
         gallery.style.display = 'none';
         return;
     }
-    
+
     emptyState.style.display = 'none';
     gallery.style.display = 'grid';
-    
+
     filteredImages.forEach(image => {
         const card = createImageCard(image);
         gallery.appendChild(card);
@@ -213,11 +215,11 @@ function renderGallery() {
 function createImageCard(image) {
     const card = document.createElement('div');
     card.className = 'card';
-    
+
     // Extract filename without extension for display
     const filename = image.replace(/\.[^/.]+$/, "");
     const extension = image.split('.').pop();
-    
+
     card.innerHTML = `
         <img src="/images/${image}" alt="${filename}" class="card-image">
         <div class="card-content">
@@ -238,19 +240,19 @@ function createImageCard(image) {
             </div>
         </div>
     `;
-    
+
     return card;
 }
 
 // Search and Filter
 function handleSearch() {
     const searchTerm = searchInput.value.toLowerCase();
-    
+
     filteredImages = images.filter(image => {
         const filename = image.replace(/\.[^/.]+$/, "").toLowerCase();
         return filename.includes(searchTerm);
     });
-    
+
     renderGallery();
 }
 
@@ -262,11 +264,11 @@ function applyFilters() {
 // View Toggle
 function handleViewToggle(e) {
     const view = e.target.getAttribute('data-view') || e.target.closest('button').getAttribute('data-view');
-    
+
     // Update active state
     viewToggleButtons.forEach(btn => btn.classList.remove('active'));
     e.target.classList.add('active');
-    
+
     // Toggle view
     if (view === 'grid') {
         gallery.classList.remove('gallery-list');
@@ -301,7 +303,7 @@ function showToast(message, type = 'info') {
     toast.textContent = message;
     toast.className = `toast ${type}`;
     toast.classList.add('show');
-    
+
     setTimeout(() => {
         toast.classList.remove('show');
     }, 3000);
@@ -326,7 +328,7 @@ function openImageViewer(imageName) {
             </div>
         </div>
     `;
-    
+
     document.body.appendChild(modal);
     document.body.style.overflow = 'hidden';
 }
