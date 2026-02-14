@@ -1,22 +1,109 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Public Image Server</title>
     <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 </head>
 <body>
+    <div class="container">
+        <header class="header">
+            <div class="logo-container">
+                <i class="fas fa-cloud-upload-alt logo-icon"></i>
+                <h1>Public Image Server</h1>
+            </div>
+            <p class="subtitle">Upload, organize, and share your images with ease</p>
+        </header>
 
-<h1>Public Image Upload & Download</h1>
+        <main class="main-content">
+            <section class="upload-section">
+                <div class="upload-card">
+                    <div class="upload-header">
+                        <h2><i class="fas fa-plus-circle"></i> Upload New Image</h2>
+                        <p class="upload-subtitle">Drag and drop or click to upload</p>
+                    </div>
+                    
+                    <form id="uploadForm" class="upload-form" enctype="multipart/form-data">
+                        <div class="file-input-wrapper">
+                            <input type="file" name="image" id="fileInput" accept="image/*" required>
+                            <label for="fileInput" class="file-label">
+                                <div class="file-content">
+                                    <i class="fas fa-cloud-upload-alt upload-icon"></i>
+                                    <span class="file-text">Choose an image file</span>
+                                    <span class="file-hint">PNG, JPG, GIF up to 10MB</span>
+                                </div>
+                            </label>
+                        </div>
+                        
+                        <div class="preview-container" id="previewContainer" style="display: none;">
+                            <img id="previewImage" alt="Preview" class="preview-image">
+                            <button type="button" class="remove-preview" id="removePreview">
+                                <i class="fas fa-times"></i>
+                            </button>
+                        </div>
+                        
+                        <button type="submit" class="upload-btn" id="uploadBtn">
+                            <i class="fas fa-upload"></i>
+                            <span>Upload Image</span>
+                        </button>
+                    </form>
+                </div>
+            </section>
 
-<form id="uploadForm">
-    <input type="file" name="image" required>
-    <button type="submit">Upload</button>
-</form>
+            <section class="gallery-section">
+                <div class="section-header">
+                    <h2><i class="fas fa-images"></i> Image Gallery</h2>
+                    <div class="gallery-controls">
+                        <div class="search-box">
+                            <i class="fas fa-search"></i>
+                            <input type="text" id="searchInput" placeholder="Search images...">
+                        </div>
+                        <div class="view-toggle">
+                            <button class="view-btn active" data-view="grid">
+                                <i class="fas fa-th"></i>
+                            </button>
+                            <button class="view-btn" data-view="list">
+                                <i class="fas fa-list"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="gallery-stats">
+                    <span id="imageCount">0 images</span>
+                    <span class="divider">|</span>
+                    <span id="lastUpdated">Last updated: Just now</span>
+                </div>
 
-<hr>
+                <div id="gallery" class="gallery-grid"></div>
+                
+                <div id="emptyState" class="empty-state" style="display: none;">
+                    <i class="fas fa-image empty-icon"></i>
+                    <h3>No images yet</h3>
+                    <p>Upload your first image to get started!</p>
+                </div>
+            </section>
+        </main>
 
-<div id="gallery"></div>
+        <footer class="footer">
+            <p>&copy; 2024 Public Image Server. Built with Node.js & Express.</p>
+        </footer>
+    </div>
 
-<script src="script.js"></script>
+    <!-- Toast Notification -->
+    <div id="toast" class="toast"></div>
+
+    <!-- Loading Overlay -->
+    <div id="loadingOverlay" class="loading-overlay" style="display: none;">
+        <div class="loading-spinner">
+            <div class="spinner"></div>
+            <p>Uploading image...</p>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
 </body>
 </html>
